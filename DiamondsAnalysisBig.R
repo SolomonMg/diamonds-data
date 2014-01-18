@@ -172,20 +172,51 @@ library('RCurl')
 diamondsurl = getBinaryURL("https://raw.github.com/solomonm/diamonds-data/master/BigDiamonds.Rda")
 load(rawConnection(diamondsurl))
 
-m1 = lm(I(log(price))~ I(carat^(1/3)), data=diamonds[diamonds$cert=="GIA",])
+m1 = lm(I(log(price))~ I(carat^(1/3)), data=diamondsbig[diamondsbig$cert=="GIA" & diamondsbig$price < 10000,])
 m2 = update(m1, ~ . + carat)
 m3 = update(m2, ~ . + I(as.numeric(clarity)) )
 m4 = update(m3, ~ . + I(as.numeric(color)) + I(as.numeric(cut)) )
 library(memisc)
 mtable(m1, m2, m3, m4)
 
-# m1 = lm(I(log(price))~  I(carat^(1/3)), data=diamonds)
-# m2 = update(m1, ~ . + carat)
-# m3 = update(m2, ~ . + cut )
-# m4 = update(m3, ~ . + color )
-# m5 = update(m4, ~ . + clarity )
+ m1 = lm(I(log(price))~  I(carat^(1/3)), data=diamonds)
+ m2 = update(m1, ~ . + carat)
+ m3 = update(m2, ~ . + cut )
+ m4 = update(m3, ~ . + color + clarity)
 # library(memisc)
 # mtable(m1, m2, m3, m4, m5)
+
+diamondsbig = diamonds
+
+diamondsbig$logprice = log(diamondsbig$price) 
+
+m1 = lm(logprice~ I(carat^(1/3)), data=diamondsbig[diamondsbig$cert=="GIA" & diamondsbig$price < 10000,])
+m2 = update(m1, ~ . + carat)
+m3 = update(m2, ~ . + I(as.numeric(clarity)) )
+m4 = update(m3, ~ . + I(as.numeric(color)) + I(as.numeric(cut)) )
+library(memisc)
+mtable(m1, m2, m3, m4)
+
+
+
+
+
+m1 = lm(logprice~  I(carat^(1/3)), data=diamondsbig[,c(1:4, 13)])
+m2 = update(m1, ~ . + carat)
+m3 = update(m2, ~ . + cut )
+m4 = update(m3, ~ . + color + clarity)
+mtable(m1, m2, m3, m4)
+
+
+
+
+#install.packages('DAAG')
+library(DAAG)
+cv2 = cv.lm(df=na.omit(diamondsbig[,c(1:4, 13)]), m2, m=10) 
+cv3 = cv.lm(df=diamondsbig[,c(1:4, 13)], m3, m=10) 
+cv4 = cv.lm(df=diamondsbig[,c(1:4, 13)], m4, m=10) 
+
+
 
 levels(cv$color)
 
@@ -196,8 +227,13 @@ exp(modEst)
 # Example from BlueNile
 # Round 1.00Very GoodIVS1 Jan 16 $5,601
 
-thisDiamond = data.frame(carat = 1.00, cut = "Very Good", color = "I", clarity="VS1")
+levels(diamonds$cut)
+thisDiamond = data.frame(carat = 1.00, cut = "V.Good", color = "I", clarity="VS1")
 modEst = predict(m4, newdata = thisDiamond, interval="prediction", level = .95)
+exp(modEst)
+
+thisDiamond = data.frame(carat = 1.00)
+modEst = predict(m2, newdata = thisDiamond, interval="prediction", level = .95)
 exp(modEst)
 
 

@@ -79,7 +79,12 @@ diamonds$cert = factor(diamonds$cert,
         "HRD", "AGS", "OTHER"))
 diamonds$cert[is.na(diamonds$cert)] = "OTHER"
 
-save(diamonds, file="data/BigDiamonds.Rda")
+diamonds$color = factor(diamonds$color, levels = rev(levels(diamonds$color)))
+diamonds$clarity = factor(diamonds$clarity, levels = rev(levels(diamonds$clarity)))
+
+diamondsbig = diamonds
+
+save(diamondsbig, file="data/BigDiamonds.Rda")
 
 
 
