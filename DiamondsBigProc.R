@@ -20,11 +20,6 @@ dat$price = gsub("\\$", "", dat$price)
 dat$price = gsub(",", "", dat$price)
 dat$price = as.numeric(dat$price)
 
-tail(dat$measurements)
-dat$x = dat$measurements
-
-which(is.na(dat$measurements))
-
 library('stringr')
 
 regx = "(\\d+(\\.\\d+)?)\\s*[x\\-]\\s*(\\d+(\\.\\d+)?)\\s*x\\s*(\\d+(\\.\\d+)?)"
@@ -37,17 +32,6 @@ dat$z = as.numeric(dat$z)
 summary(dat$x)
 summary(dat$y)
 summary(dat$z)
-
-hist(dat$y[dat$y<20], 50)
-summary(dat$y[dat$cert=="HRD"])
-summary(dat$x)
-summary(dat$z)
-dat = dat[-which.max(dat$x),]
-dat = dat[-which.max(dat$y),]
-dat = dat[-which.max(dat$x),]
-dat[which.max(dat$x),]
-
-#load( file="data/BigDiamonds.Rda")
 
 # make factor levels:
 dat$cut[dat$cut=="H&A;"] = "Ideal"
@@ -64,7 +48,7 @@ clrty = c("IF", "VVS1", "VVS2", "VS1", "VS2", "SI1", "SI2", "I1", "I2", "I3")
 dat$clarity = factor(dat$clarity, levels = clrty)
 
 
-diamonds = dat[,-8]
+diamonds = dat
 
 # WOW xyz is screwed up.
 hist(diamonds$y[diamonds$y<20])
@@ -79,6 +63,7 @@ diamonds$z[diamonds$z==0] = NA
 #table(diamonds$x > diamonds$y)
 #table(diamonds$y > diamonds$z)
 
+# really things should be arranged like this:
 #x > y > z
 #xyz = diamonds[9:11]
 #XYZ = adply(xyz, 1, transform, 
