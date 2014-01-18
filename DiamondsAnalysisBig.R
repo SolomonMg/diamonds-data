@@ -22,7 +22,7 @@ ggpairs(na.omit(diasamp), params = c(shape = I("."), outlier.shape = I(".")))
 dev.off()
 
 
-p = qplot(price, data=diamonds, binwidth=100) +
+p = qplot(price, data=diamonds, binwidth=0.01) +
 		theme_bw() +
 		ggtitle("Price")
 p
@@ -167,9 +167,10 @@ p
 ggsave("plots/caratpricecolorlog10.png", height=5, width=6.25)
 
 
-
-
-
+#install.packages('RCurl')
+library('RCurl')
+diamondsurl = getBinaryURL("https://raw.github.com/solomonm/diamonds-data/master/BigDiamonds.Rda")
+load(rawConnection(diamondsurl))
 
 m1 = lm(I(log(price))~ I(carat^(1/3)), data=diamonds[diamonds$cert=="GIA",])
 m2 = update(m1, ~ . + carat)
