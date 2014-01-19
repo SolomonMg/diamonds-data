@@ -8,7 +8,7 @@ library('RCurl')
 diamondsurl = getBinaryURL("https://raw.github.com/solomonm/diamonds-data/master/BigDiamonds.Rda")
 load(rawConnection(diamondsurl))
 
-diamondsbig = diamondsbig[diamondsbig$cert=="GIA",]
+#diamondsbig = diamondsbig[diamondsbig$cert=="GIA",]
 
 #install.packages('GGally')
 #install.packages('ggplot2')
@@ -169,31 +169,25 @@ p
 
 ggsave("plots/caratpricecolorlog10.png", height=5, width=6.25)
 
-
 diamondsbig$logprice = log(diamondsbig$price) 
 
-m1 = lm(logprice~  I(carat^(1/3)), data=diamondsbig[,c(1:4, 13)])
+
+#install.packages('memisc')
+library('memisc')
+m1 = lm(logprice~  I(carat^(1/3)), 
+    data=diamondsbig[diamondsbig$price < 10000 & diamondsbig$cert == "GIA",])
 m2 = update(m1, ~ . + carat)
 m3 = update(m2, ~ . + cut )
 m4 = update(m3, ~ . + color + clarity)
 mtable(m1, m2, m3, m4)
 
-
-thisDiamond = data.frame(carat = .7, cut = "Ideal", color = "I", clarity="VS2")
-modEst = predict(m4, newdata = thisDiamond, interval="prediction", level = .95)
-exp(modEst)
-
 # Example from BlueNile
 # Round 1.00Very GoodIVS1 Jan 16 $5,601
 
-levels(diamonds$cut)
 thisDiamond = data.frame(carat = 1.00, cut = "V.Good", color = "I", clarity="VS1")
 modEst = predict(m4, newdata = thisDiamond, interval="prediction", level = .95)
 exp(modEst)
 
-thisDiamond = data.frame(carat = 1.00)
-modEst = predict(m2, newdata = thisDiamond, interval="prediction", level = .95)
-exp(modEst)
 
 # This will take a while to run
 #install.packages('DAAG')
